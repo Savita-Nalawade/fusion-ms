@@ -6,5 +6,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class mlogs {
     @GetMapping("/mlogs")
-    public String getData() {return  "Please provide maven jobs running logs and details" ; }
+    public String getData() {return  "Please provide maven jobs running logs info and details" ; }
 }
