@@ -7,7 +7,6 @@ pipeline {
     }
 
     tools {
-
         maven 'maven_3.9.4'
     }
 
@@ -34,11 +33,49 @@ pipeline {
             }
         }
         stage('Building & Tag Docker Image') {
-                    steps {
-                        echo "Starting Building Docker Image"
-                        sh "docker build -t fusion-ms ."
-                        echo 'Docker Image Build Completed'
-                    }
-                }
+            steps {
+                echo "Starting Building Docker Image"
+                sh "docker build -t savitanalawade/fusion-ms ."
+                sh "docker build -t fusion-ms ."
+                echo 'Docker Image Build Completed'
+            }
+        }
+        stage('Docker Image Scanning') {
+            steps {
+                echo 'Docker Image Scanning Started'
+                sh 'docker --version'
+                echo 'Docker Image Scanning Started'
+            }
+        }
+        stage(' Docker push to Docker Hub') {
+           steps {
+              script {
+                 withCredentials([string(credentialsId: 'dockerhubCred', variable: 'dockerhubCred')]){
+                 sh 'docker login docker.io -u savitanalawade -p ${dockerhubCred}'
+                 echo "Push Docker Image to DockerHub : In Progress"
+                 sh 'docker push savitanalawade/fusion-ms:latest'
+                 echo "Push Docker Image to DockerHub : In Progress"
+                 }
+              }
+            }
+        }
+        stage(' Docker Image Push to Amazon ECR') {
+           steps {
+              script {
+                 withDockerRegistry([credentialsId:'ecr:ap-south-1:ecr-credentials', url:"https://664418982701.dkr.ecr.ap-south-1.amazonaws.com"]){
+                 sh """
+                 echo "List the docker images present in local"
+                 docker images
+                 echo "Tagging the Docker Image: In Progress"
+                 docker tag fusion-ms:latest 664418982701.dkr.ecr.ap-south-1.amazonaws.com/fusion-ms:latest
+                 echo "Tagging the Docker Image: Completed"
+                 echo "Push Docker Image to ECR : In Progress"
+                 docker push 664418982701.dkr.ecr.ap-south-1.amazonaws.com/fusion-ms:latest
+                 echo "Push Docker Image to ECR : Completed"
+                 """
+                 }
+              }
+           }
+        }
     }
 }
