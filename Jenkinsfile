@@ -81,7 +81,7 @@ pipeline {
                     steps {
                         script {
                             withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                                sh 'docker login http://3.108.61.162:8081/repository/fusion-ms/ -u admin -p ${PASSWORD}'
+                                echo "your_password" | docker login http://3.108.61.162:8081 -u admin --password-stdin
                                 echo "Push Docker Image to Nexus : In Progress"
                                 sh 'docker tag fusion-ms 3.108.61.162:8081/fusion-ms:latest'
                                 sh 'docker push 3.108.61.162:8081/fusion-ms'
