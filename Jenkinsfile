@@ -57,12 +57,12 @@ pipeline {
             }
         }
         stage('Docker Image Scanning') {
-            steps {
-                echo 'Docker Image Scanning Started'
-                sh 'docker --version'
-                echo 'Docker Image Scanning Started'
-            }
-        }
+                    steps {
+                        echo 'Scanning Docker Image with Trivy...'
+                        sh 'trivy image ${DOCKER_IMAGE}:latest || echo "Scan Failed - Proceeding with Caution"'
+                        echo 'Docker Image Scanning Completed!'
+                    }
+                }
         stage(' Docker push to Docker Hub') {
            steps {
               script {
