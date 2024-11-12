@@ -57,12 +57,12 @@ pipeline {
             }
         }
         stage('Docker Image Scanning') {
-            steps {
-                echo 'Docker Image Scanning Started'
-                sh 'docker --version'
-                echo 'Docker Image Scanning Started'
-            }
-        }
+                    steps {
+                        echo 'Scanning Docker Image with Trivy...'
+                        sh 'trivy image ${DOCKER_IMAGE}:latest || echo "Scan Failed - Proceeding with Caution"'
+                        echo 'Docker Image Scanning Completed!'
+                    }
+                }
         stage(' Docker push to Docker Hub') {
            steps {
               script {
@@ -104,6 +104,14 @@ pipeline {
                                 echo "Push Docker Image to Nexus : Completed"
                             }
                         }
+                    }
+                }
+        stage('Cleanup Docker Images') {
+                    steps {
+                        echo 'Cleaning up local Docker images...'
+                        sh "docker rmi -f ${DOCKER_IMAGE}:latest || true"
+                        sh "docker rmi -f ${ECR_REPO}:latest || true"
+                        echo 'Local Docker images deleted successfully!'
                     }
                 }
 
