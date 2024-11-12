@@ -114,6 +114,5 @@ pipeline {
                         echo 'Local Docker images deleted successfully!'
                     }
                 }
-
     }
 }
